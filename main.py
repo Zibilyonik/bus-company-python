@@ -2,8 +2,6 @@
 import json
 
 # checks data types of the input
-
-
 def check_data_type(data):
     if isinstance(data, dict):
         return "dict"
@@ -20,6 +18,17 @@ def check_data_type(data):
     else:
         return "none"
 
+#checks if the hour is army time
+def check_time(time):
+    if len(time) != 5:
+        return False
+    if time[2] != ":":
+        return False
+    if not time[:2].isdigit() or not time[3:].isdigit():
+        return False
+    if int(time[:2]) > 23 or int(time[3:]) > 59:
+        return False
+    return True
 
 def main():
     expected_data_types = {
