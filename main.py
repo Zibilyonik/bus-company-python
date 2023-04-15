@@ -34,6 +34,7 @@ def check_time(time):
     return True
 
 def check_stop_name(name):
+    print(name)
     regex = r"^[A-Z][a-z]+ (Road|Avenue|Boulevard|Street$)"
     if re.search(regex, name) == name:
         return True
@@ -54,15 +55,18 @@ def main():
     for item in json_data:
         for key, value in item.items():
             if key == "stop_name":
-                if check_stop_name(value) is False:
+                if check_stop_name(value) is False \
+                or check_data_type(value) != expected_data_types[key]:
                     errors["stop_name"] += 1
                     total += 1
             elif key == "stop_type":
-                if value != "" and value != "S" and value != "O" and value != "F":
+                if value not in ["S", "O", "F"] \
+                or check_data_type(value) != expected_data_types[key]:
                     errors["stop_type"] += 1
                     total += 1
             elif key == "a_time":
-                if check_time(value) is False:
+                if check_time(value) is False or \
+                check_data_type(value) != expected_data_types[key]:
                     errors["a_time"] += 1
                     total += 1
     print(f'Format validation: {total} errors')
