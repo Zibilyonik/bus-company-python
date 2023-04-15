@@ -1,5 +1,6 @@
 # python3
 import json
+import re
 
 # checks data types of the input
 def check_data_type(data):
@@ -20,6 +21,8 @@ def check_data_type(data):
 
 #checks if the hour is army time
 def check_time(time):
+    if isinstance(time, str) is False:
+        return False
     if len(time) != 5:
         return False
     if time[2] != ":":
@@ -30,6 +33,12 @@ def check_time(time):
         return False
     return True
 
+def check_stop_name(name):
+    regex = r"^[A-Z][a-z]+ (Road|Avenue|Boulevard|Street$)"
+    if re.search(regex, name) == name:
+        return True
+    return False
+
 def main():
     expected_data_types = {
         "bus_id": "int",
@@ -39,18 +48,24 @@ def main():
         "stop_type": "str",
         "a_time": "str"
     }
-    errors = {"bus_id": 0, "stop_id": 0, "stop_name": 0,
-              "next_stop": 0, "stop_type": 0, "a_time": 0}
+    errors = {"stop_name": 0, "stop_type": 0, "a_time": 0}
     total = 0
     json_data = json.loads(input())
     for item in json_data:
         for key, value in item.items():
-            if check_data_type(value) != expected_data_types[key] or \
-                (value == "" and key != "stop_type") or \
-                (key == "stop_type" and value not in ["", "S", "O", "F"]):
-                errors[key] += 1
-                total += 1
-    print(f'Type and required field validation: {total} errors')
+            if key == "stop_name":
+                if check_stop_name(value) is False:
+                    errors["stop_name"] += 1
+                    total += 1
+            elif key == "stop_type":
+                if value != "" and value != "S" and value != "O" and value != "F":
+                    errors["stop_type"] += 1
+                    total += 1
+            elif key == "a_time":
+                if check_time(value) is False:
+                    errors["a_time"] += 1
+                    total += 1
+    print(f'Format validation: {total} errors')
     for key, value in errors.items():
         print(f"{key}: {value}")
 
