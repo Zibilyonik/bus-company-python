@@ -2,7 +2,6 @@
 import json
 import re
 
-# checks data types of the input
 def check_data_type(data):
     if isinstance(data, dict):
         return "dict"
@@ -19,7 +18,6 @@ def check_data_type(data):
     else:
         return "none"
 
-#checks if the hour is army time
 def check_time(time):
     if isinstance(time, str) is False:
         return False
@@ -34,10 +32,11 @@ def check_time(time):
     return True
 
 def check_stop_name(name):
-    print(name)
-    regex = r"^[A-Z][a-z]+ (Road|Avenue|Boulevard|Street$)"
-    if re.search(regex, name) == name:
+    regex = r"^([A-Z][a-z]+\s)([A-Z][a-z]+\s)?(Road|Avenue|Boulevard|Street)$"
+    if re.search(regex, name):
         return True
+    else:
+        print(name)
     return False
 
 def main():
@@ -60,7 +59,7 @@ def main():
                     errors["stop_name"] += 1
                     total += 1
             elif key == "stop_type":
-                if value not in ["S", "O", "F"] \
+                if value not in ["", "S", "O", "F"] \
                 or check_data_type(value) != expected_data_types[key]:
                     errors["stop_type"] += 1
                     total += 1
