@@ -52,24 +52,36 @@ def main():
     lines = {}
     types = {"S": [], "F": []}
     stops = []
+    line_stops = {}
     transfers = []
     # total = 0
     json_data = json.loads(input())
     for item in json_data:
-        if item["stop_name"] in stops:
+        if item["stop_name"] in stops and item["stop_name"] not in transfers:
             transfers.append(item["stop_name"])
         else:
             stops.append(item["stop_name"])
-        if item["stop_type"]:
-            if item["stop_type"] not in types:
-                types["stop_type"] = [item["stop_name"]]
+        if item["stop_type"] in ["S", "F"]:
+            if item["bus_id"] not in line_stops:
+                line_stops[item["bus_id"]] = item["stop_type"]
             else:
-                types["stop_type"].append(item["stop_name"])
+                line_stops[item["bus_id"]] += item["stop_type"]
+            if item["stop_name"] not in types[item["stop_type"]]:
+                types[item["stop_type"]].append(item["stop_name"])
         if item["bus_id"] not in lines:
             lines[item["bus_id"]] = [item["stop_name"]]
         else:
             lines[item["bus_id"]].append(item["stop_name"])
-    
+    for line in lines:
+        if line_stops[line] not in  ["SF", "FS"]:
+            print(f"There is no start or end stop for the line: {line}.")
+            return
+    types["S"].sort()
+    transfers.sort()
+    types["F"].sort()
+    print(f'Start stops: {len(types["S"])} {types["S"]}')
+    print(f'Transfer stops: {len(transfers)} {transfers}')
+    print(f'Finish stops: {len(types["F"])} {types["F"]}')
 
 
 if __name__ == "__main__":
