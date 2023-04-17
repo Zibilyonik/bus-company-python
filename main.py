@@ -2,42 +2,41 @@
 import json
 
 
-def time_order_check(lines):
-    errors = []
-    for line in range(len(lines)):
-        if line == 0:
-            continue
-        if lines[line]["time"] < lines[line - 1]["time"]:
-            errors.append(line)
-    return errors
+def check_transfer(line):
+    checked = []
+    transfers = []
+    for item in line:
+        if item not in checked:
+            checked.append(item)
+        elif item not in transfers:
+            transfers.append(item)
+    return transfers
 
 def main():
-    lines = {}
+    stops = []
+    on_demands = []
+    starts = []
+    ends = []
+    errors = []
     json_data = json.loads(input())
     for item in json_data:
+        stops.append(item["stop_name"])
         if item["stop_type"] == "S":
-            lines[item["bus_id"]] = [
-                {"bus_id": item["bus_id"], "stop_name": item["stop_name"], "stop_id": item["stop_id"], "time": item["a_time"]}
-            ]
-        else:
-            lines[item["bus_id"]].append(
-                {"bus_id": item["bus_id"], "stop_name": item["stop_name"], "stop_id": item["stop_id"], "time": item["a_time"]}
-            )
-    
-    print("Arrival time test:")
-    for line in lines.items():
-        errors = time_order_check(line)
-        if len(errors) == 0:
-            print("OK")
-        else:
-            checked = []
-            for error in errors:
-                if error["bus_id"] not in checked:
-                    checked.append(error["bus_id"])
-                    print(
-                        f"bus_id line {line}: wrong time on station {lines[line][error]['stop_id']}"
-                    )
-
+            starts.append(item["stop_name"])
+        elif item["stop_type"] == "F":
+            ends.append(item["stop_name"])
+        elif item["stop_type"] == "O":
+            on_demands.append(item["stop_name"])
+    transfers = check_transfer(stops)
+    for item in on_demands:
+        if item in transfers or item in starts or item in ends:
+            errors.append(item)
+    errors.sort()
+    print("On demand stops test:")
+    if len(errors) == 0:
+        print("OK")
+    else:
+        print(f'Wrong stop type: {errors}')
 
 if __name__ == "__main__":
     main()
